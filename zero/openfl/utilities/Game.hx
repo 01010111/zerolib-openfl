@@ -21,7 +21,7 @@ class Game {
 
 	public var scene(default, null):Scene;
 	#if echo
-	public var world(default, null):World;
+	public var world(default, null):echo.World;
 	#end
 
 	public static var root:Sprite;
@@ -33,7 +33,7 @@ class Game {
 		Game.root = root;
 
 		#if echo
-		world = new World({
+		world = new echo.World({
 			width: Game.width,
 			height: Game.height
 		});
