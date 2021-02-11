@@ -16,20 +16,19 @@ using zero.utilities.EventBus;
 class Game {
 
 	public static var i:Game;
-
 	public static var width(get, never):Float;
-	static function get_width() return Lib.application.window.width;
+	public static var height(get, never):Float;	
+	public static var root:Sprite;
+	public static var mouse:Vec2 = [0, 0];
 
-	public static var height(get, never):Float;
+	static function get_width() return Lib.application.window.width;
 	static function get_height() return Lib.application.window.height;
 
 	public var scene(default, null):Scene;
+	public var time_scale:Float = 1;
 	#if echo
 	public var world(default, null):echo.World;
 	#end
-
-	public static var root:Sprite;
-	public static var mouse:Vec2 = [0, 0];
 
 	var last = Date.now().getTime();
 
@@ -40,6 +39,8 @@ class Game {
 		root.addEventListener(Event.ENTER_FRAME, tick);
 		root.addEventListener(Event.EXIT_FRAME, (e) -> 'post_update'.dispatch());
 		root.addEventListener(Event.RESIZE, (e) -> 'resize'.dispatch({ width: width, height: height }));
+
+		Keys.init();
 
 		#if echo
 		world = new echo.World({
@@ -65,8 +66,8 @@ class Game {
 
 	function tick(e:Event) {
 		var time = Date.now().getTime();
-		var dt = (time - last) / 1000;
-		last = time
+		var dt = (time - last) / 1000 * time_scale;
+		last = time;
 		Timer.update(dt);
 		Tween.update(dt);
 		'update'.dispatch(dt);
