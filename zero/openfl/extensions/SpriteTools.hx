@@ -1,5 +1,8 @@
 package zero.openfl.extensions;
 
+import openfl.geom.Point;
+import openfl.events.MouseEvent;
+import openfl.events.Event;
 import openfl.display.BitmapData;
 import zero.openfl.utilities.Game;
 import openfl.display.Bitmap;
@@ -150,6 +153,18 @@ class SpriteTools {
 	public static function center(sprite:Sprite):Sprite {
 		set_position(sprite, Game.width/2, Game.height/2);
 		return sprite;
+	}
+
+	public static function on<T>(sprite:Sprite, event:openfl.events.EventType<T>, callback:Dynamic -> Sprite -> Void):Sprite {
+		sprite.addEventListener(event, (e) -> callback(e, sprite));
+		return sprite;
+	}
+
+	public static function global_position(sprite:Sprite):Vec2 {
+		var pos = new Point(sprite.x, sprite.y);
+		var global_pos = sprite.parent.localToGlobal(pos);
+		var out = Vec2.get(global_pos.x, global_pos.y);
+		return out;
 	}
 
 }
