@@ -30,21 +30,17 @@ class Dolly extends Sprite {
 
 	public function update(?dt:Float) {
 		if (target == null) return;
-		var zoomX = scaleX;
-		var zoomY = scaleY;
-		var p = parent;
-		while (p != null) {
-			zoomX *= p.scaleX;
-			zoomY *= p.scaleY;
-			p = p.parent;
+		var zoom = 1.0;
+		var parent = this.parent;
+		while (parent != null) {
+			zoom *= parent.scaleX;
+			parent = parent.parent;
 		}
-		position.set(-target.x * zoomX + Game.width/2, -target.y * zoomY + Game.height/2);
+		position.set(-target.x + Game.width / zoom / 2, -target.y + Game.height / zoom / 2);
 		offset.x += (-Controller.get_axis(RIGHT_ANALOG_X) * offset_amt.x - offset.x) * 0.1;
 		offset.y += (-Controller.get_axis(RIGHT_ANALOG_Y) * offset_amt.y - offset.y) * 0.1;
 		x += (position.x + offset.x - x) * 0.1;
 		y += (position.y + offset.y - y) * 0.1;
-		x = x.floor();
-		y = y.floor();
 	}
 
 }
