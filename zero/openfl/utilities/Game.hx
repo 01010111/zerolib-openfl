@@ -1,5 +1,6 @@
 package zero.openfl.utilities;
 
+import openfl.events.FocusEvent;
 import zero.utilities.Tween;
 import zero.utilities.Tween.TweenProperty;
 import zero.utilities.Timer;
@@ -28,17 +29,23 @@ class Game {
 	public var time_scale:Float = 1;
 	#if echo
 	public var world(default, null):echo.World;
+	#if debug
+	var debug:echo.util.Debug.OpenFLDebug;
+	#end
 	#end
 
-	var last = Date.now().getTime();
+	var last = haxe.Timer.stamp();
+	var focus_lost:Bool = false;
 
-	public function new(root:Sprite, scene:Class<Scene>) {
+	public function new(root:Sprite, scene:Class<Scene>, bg_color:Int = 0x000000) {
 		i = this;
-		Game.root = root;
 
+		Game.root = root;
+		root.stage.color = bg_color;
 		root.addEventListener(Event.ENTER_FRAME, tick);
 		root.addEventListener(Event.EXIT_FRAME, (e) -> 'post_update'.dispatch());
 		root.addEventListener(Event.RESIZE, (e) -> 'resize'.dispatch({ width: width, height: height }));
+		root.addEventListener(Event.DEACTIVATE, (e) -> focus_lost = true);
 
 		Keys.init();
 
@@ -47,6 +54,17 @@ class Game {
 			width: Game.width,
 			height: Game.height
 		});
+
+		#if debug
+		debug = new echo.util.Debug.OpenFLDebug();
+		debug.canvas.visible = false;
+		var debug_update = (?dt) -> {
+			if (Keys.just_pressed(192)) debug.canvas.visible = !debug.canvas.visible;
+			debug.draw(world);
+		}
+		debug_update.listen('update');
+		#end
+
 		#end
 
 		change_scene(Type.createInstance(scene, []));
@@ -58,6 +76,10 @@ class Game {
 		scene.create();
 		root.add(scene);
 		#if debug
+		#if echo
+		root.add(debug.canvas);
+		debug.canvas.set_scale(scene.scaleX, scene.scaleY);
+		#end
 		var fps = new FPS(32, Game.height - 80, 0xFFFFFF);
 		root.add(fps);
 		((?_) -> fps.y = Game.height - 80).listen('resize');
@@ -65,15 +87,19 @@ class Game {
 	}
 
 	function tick(e:Event) {
-		var time = Date.now().getTime();
-		var dt = (time - last) / 1000 * time_scale;
+		if (focus_lost) {
+			last = haxe.Timer.stamp();
+			focus_lost = false;
+			return;
+		}
+		var time = haxe.Timer.stamp();
+		var dt = time - last;
+		if (dt > 1) trace(dt);
 		last = time;
-		Timer.update(dt);
-		Tween.update(dt);
+		#if echo if (world != null) world.step(dt); #end
 		'update'.dispatch(dt);
-		#if echo
-		if (world != null) world.step(dt);
-		#end
+		Tween.update(dt);
+		Timer.update(dt);
 	}
 	
 }
