@@ -37,7 +37,10 @@ class AnimatedSprite extends Sprite {
 
 	function init_animations(options:AnimatedSpriteOptions) {
 		animation = new AnimationManager({ on_frame_change: (i) -> frame.id = i });
-		for (data in options.animations) animation.add(data);
+		for (data in options.animations) {
+			if (data.frames.length == 1) data.frames.push(data.frames[0]);
+			animation.add(data);
+		}
 	}
 
 	public function get_frame_index() {
