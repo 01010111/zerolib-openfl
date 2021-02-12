@@ -3,21 +3,22 @@ package zero.openfl.utilities;
 import zero.utilities.IntPoint;
 import openfl.display.Tile;
 import openfl.geom.Rectangle;
-import openfl.display.Tilemap as OTilemap;
-import openfl.display.Tileset as OTileset;
+import openfl.display.Tilemap as OpenFLTilemap;
+import openfl.display.Tileset as OpenFLTileset;
 
 using openfl.Assets;
 using zero.extensions.ArrayExt;
 using Math;
 using Std;
 
-class Tilemap extends OTilemap {
+class Tilemap extends OpenFLTilemap {
 
 	#if echo
-	public var bodies:Array<Body>;
+	public var bodies:Array<echo.Body>;
 	#end
 	var map:Array<Array<Int>>;
 	var options:TilemapOptions;
+	var tiles:Array<Array<Tile>>;
 
 	public function new(options:TilemapOptions) {
 		super(
@@ -62,19 +63,20 @@ class Tilemap extends OTilemap {
 		Game.i.world.height = map.length * options.tileset.frame_height;
 		#end
 		if (options.solids != null) make_solids(map, options.solids);
-		for (j in 0...map.length) for (i in 0...map[j].length) {
-			addTile(new Tile(map[j][i], i * w, j * h));
+		tiles = [];
+		for (j in 0...map.length) {
+			tiles[j] = [];
+			for (i in 0...map[j].length) {
+				if (map[j][i] < 0) continue;
+				tiles[j][i] = addTile(new Tile(map[j][i], i * w, j * h));
+			}
 		}
 	}
 
 	function make_solids(map:Array<Array<Int>>, solids:Array<Int>) {
 		#if echo
-		bodies = echo.util.TileMap.generate([for (j in 0...map.length) for (i in 0...map[j].length) solids.contains(map[j][i]) ? 1 : -1], 16, 16, map[0].length, map.length);
-		for (body in bodies) {
-			Game.i.world.add(body);
-			PLAYSTATE.physics_objects.push(body);
-			PLAYSTATE.obstructions.push(body);
-		}
+		bodies = echo.util.TileMap.generate([for (j in 0...map.length) for (i in 0...map[j].length) solids.contains(map[j][i]) ? 1 : -1], options.tileset.frame_width, options.tileset.frame_height, map[0].length, map.length);
+		for (body in bodies) Game.i.world.add(body);
 		#end
 	}
 
@@ -111,8 +113,8 @@ class Tilemap extends OTilemap {
 		return out;
 	}
 
-	function get_tile(x:Int, y:Int) {
-		return getTileAt(y * map[0].length + x);
+	public function get_tile(x:Int, y:Int) {
+		return tiles[y][x];
 	}
 
 	function translate_float_to_map(x:Float, y:Float):IntPoint {
@@ -121,7 +123,7 @@ class Tilemap extends OTilemap {
 
 }
 
-class Tileset extends OTileset {
+class Tileset extends OpenFLTileset {
 
 	public function new(options:TilesetOptions) {
 		super(options.image.getBitmapData());
