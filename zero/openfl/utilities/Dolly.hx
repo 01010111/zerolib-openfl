@@ -5,6 +5,7 @@ import openfl.display.Sprite;
 import zero.utilities.Vec2;
 
 using Math;
+using zero.utilities.EventBus;
 
 class Dolly extends Sprite {
 
@@ -14,8 +15,15 @@ class Dolly extends Sprite {
 	var offset:Vec2 = [0, 0];
 	var offset_amt:Vec2 = [96, 64];
 
-	public function new() {
+	public static var i:Dolly;
+
+	public var pixel_perfect:Bool = true;
+
+	public function new(?parent:Scene) {
 		super();
+		i = this;
+		if (parent != null) parent.addChild(this);
+		update.listen('update');
 	}
 
 	public function follow(target:DisplayObject, snap:Bool = true, ?tilemap:Tilemap) {
@@ -41,6 +49,10 @@ class Dolly extends Sprite {
 		offset.y += (-Controller.get_axis(RIGHT_ANALOG_Y) * offset_amt.y - offset.y) * 0.1;
 		x += (position.x + offset.x - x) * 0.1;
 		y += (position.y + offset.y - y) * 0.1;
+		if (pixel_perfect) {
+			x = x.round();
+			y = y.round();
+		}
 	}
 
 }
