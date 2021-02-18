@@ -13,6 +13,7 @@ import openfl.Lib;
 
 using zero.openfl.extensions.SpriteTools;
 using zero.utilities.EventBus;
+using Math;
 
 class Game {
 
@@ -30,7 +31,7 @@ class Game {
 	#if echo
 	public var world(default, null):echo.World;
 	#if debug
-	var debug:echo.util.Debug.OpenFLDebug;
+	public var debug:echo.util.Debug.OpenFLDebug;
 	#end
 	#end
 
@@ -46,6 +47,7 @@ class Game {
 		root.addEventListener(Event.EXIT_FRAME, (e) -> 'post_update'.dispatch());
 		root.addEventListener(Event.RESIZE, (e) -> 'resize'.dispatch({ width: width, height: height }));
 		root.addEventListener(Event.DEACTIVATE, (e) -> focus_lost = true);
+		root.addEventListener(FocusEvent.FOCUS_OUT, (e) -> focus_lost = true);
 
 		Keys.init();
 
@@ -77,8 +79,11 @@ class Game {
 		root.add(scene);
 		#if debug
 		#if echo
-		root.add(debug.canvas);
-		debug.canvas.set_scale(scene.scaleX, scene.scaleY);
+		if (Dolly.i != null) Dolly.i.add(debug.canvas);
+		else {
+			root.add(debug.canvas);
+			debug.canvas.set_scale(scene.scaleX, scene.scaleY);
+		}
 		#end
 		var fps = new FPS(32, Game.height - 80, 0xFFFFFF);
 		root.add(fps);
@@ -94,6 +99,7 @@ class Game {
 		}
 		var time = haxe.Timer.stamp();
 		var dt = time - last;
+		dt = dt.min(0.1);
 		if (dt > 1) trace(dt);
 		last = time;
 		#if echo if (world != null) world.step(dt); #end
