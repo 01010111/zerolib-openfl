@@ -1,5 +1,6 @@
 package zero.openfl.utilities;
 
+import echo.Body;
 import zero.utilities.IntPoint;
 import openfl.display.Tile;
 import openfl.geom.Rectangle;
@@ -13,9 +14,6 @@ using Std;
 
 class Tilemap extends OpenFLTilemap {
 
-	#if echo
-	public var bodies:Array<echo.Body>;
-	#end
 	var map:Array<Array<Int>>;
 	var options:TilemapOptions;
 	var tiles:Array<Array<Tile>>;
@@ -62,7 +60,6 @@ class Tilemap extends OpenFLTilemap {
 		Game.i.world.width = map[0].length * options.tileset.frame_width;
 		Game.i.world.height = map.length * options.tileset.frame_height;
 		#end
-		if (options.solids != null) make_solids(map, options.solids);
 		tiles = [];
 		for (j in 0...map.length) {
 			tiles[j] = [];
@@ -73,17 +70,35 @@ class Tilemap extends OpenFLTilemap {
 		}
 	}
 
-	function make_solids(map:Array<Array<Int>>, solids:Array<Int>) {
-		#if echo
-		bodies = echo.util.TileMap.generate([for (j in 0...map.length) for (i in 0...map[j].length) solids.contains(map[j][i]) ? 1 : -1], options.tileset.frame_width, options.tileset.frame_height, map[0].length, map.length);
-		for (body in bodies) Game.i.world.add(body);
-		#end
+	#if echo
+	public function get_bodies(tile_ids:Array<Int>, singles:Bool = false):Array<echo.Body> {
+		if (singles) {
+			var out = [];
+			var query_map = query_array(tile_ids);
+			for (j in 0...query_map.length) for (i in 0...query_map[j].length) {
+				if (query_map[j][i] > 0) {
+					var body = new Body({
+						shape: {
+							type: RECT,
+							width: options.tileset.frame_width,
+							height: options.tileset.frame_height
+						},
+						x: i * options.tileset.frame_width + options.tileset.frame_width/2,
+						y: j * options.tileset.frame_height + options.tileset.frame_height/2,
+						mass: 0,
+					});
+					body.data.tile = get_tile(i, j);
+					out.push(body);
+				}
+			}
+			return out;
+		}
+		return echo.util.TileMap.generate(query_array(tile_ids).flatten(), options.tileset.frame_width, options.tileset.frame_height, map[0].length, map.length);
 	}
+	#end
 
-	public function get_solids_array(?solids:Array<Int>):Array<Array<Int>> {
-		if (solids == null && options.solids == null) return [];
-		if (solids == null) solids = options.solids;
-		return [for (j in 0...map.length) [for (i in 0...map[j].length) solids.contains(map[j][i]) ? 1 : 0]];
+	public function query_array(tile_ids:Array<Int>):Array<Array<Int>> {
+		return [for (j in 0...map.length) [for (i in 0...map[j].length) tile_ids.indexOf(map[j][i]) >= 0 ? 1 : 0]];
 	}
 
 	public function get_map(copy:Bool = true):Array<Array<Int>> {
@@ -141,7 +156,6 @@ typedef TilemapOptions = {
 	map:Array<Array<Int>>,
 	tileset:TilesetOptions,
 	smoothing:Bool,
-	?solids:Array<Int>,
 	?auto:Bool,
 }
 
