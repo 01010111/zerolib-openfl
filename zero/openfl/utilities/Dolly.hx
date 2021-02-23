@@ -1,5 +1,6 @@
 package zero.openfl.utilities;
 
+import zero.utilities.Rect;
 import openfl.display.DisplayObject;
 import openfl.display.Sprite;
 import zero.utilities.Vec2;
@@ -14,6 +15,7 @@ class Dolly extends Sprite {
 	var position:Vec2 = [0, 0];
 	var offset:Vec2 = [0, 0];
 	var offset_amt:Vec2 = [96, 64];
+	var bounds:Rect;
 
 	public static var i:Dolly;
 
@@ -49,10 +51,16 @@ class Dolly extends Sprite {
 		offset.y += (-Controller.get_axis(RIGHT_ANALOG_Y) * offset_amt.y - offset.y) * 0.1;
 		x += (position.x + offset.x - x) * 0.1;
 		y += (position.y + offset.y - y) * 0.1;
+		if (bounds != null) {
+			x = x.min(-bounds.left).max(-bounds.right + Game.width/zoom);
+			y = y.min(-bounds.top).max(-bounds.bottom + Game.height/zoom);
+		}
 		if (pixel_perfect) {
 			x = x.round();
 			y = y.round();
 		}
 	}
+
+	public function set_bounds(rect:Rect) bounds = cast rect.copy();
 
 }
