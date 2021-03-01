@@ -5,6 +5,8 @@ class Controller {
 	static var key_map:Map<Action, Array<Int>> = [
 		A				=> [90, 67],
 		B				=> [88],
+		X				=> [90, 67],
+		Y				=> [88],
 		UP				=> [38],
 		DOWN			=> [40],
 		LEFT			=> [37],
@@ -17,6 +19,8 @@ class Controller {
 	static var pad_map:Map<Action, Button> = [
 		A				=> A,
 		B				=> B,
+		X				=> X,
+		Y				=> Y,
 		UP				=> UP,
 		DOWN			=> DOWN,
 		LEFT			=> LEFT,
