@@ -151,7 +151,7 @@ class SpriteTools {
 	}
 
 	public static function center(sprite:Sprite):Sprite {
-		set_position(sprite, Game.width/2, Game.height/2);
+		set_position(sprite, Game.width/2/Game.i.scene.zoom, Game.height/2/Game.i.scene.zoom);
 		return sprite;
 	}
 
