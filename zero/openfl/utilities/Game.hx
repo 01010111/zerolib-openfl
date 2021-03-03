@@ -56,17 +56,6 @@ class Game {
 			width: Game.width,
 			height: Game.height
 		});
-
-		#if debug
-		debug = new echo.util.Debug.OpenFLDebug();
-		debug.canvas.visible = false;
-		var debug_update = (?dt) -> {
-			if (Keys.just_pressed(192)) debug.canvas.visible = !debug.canvas.visible;
-			debug.draw(world);
-		}
-		debug_update.listen('update');
-		#end
-
 		#end
 
 		change_scene(Type.createInstance(scene, []));
@@ -79,6 +68,13 @@ class Game {
 		root.add(scene);
 		#if debug
 		#if echo
+		debug = new echo.util.Debug.OpenFLDebug();
+		debug.canvas.visible = false;
+		var debug_update = (?dt) -> {
+			if (Keys.just_pressed(192)) debug.canvas.visible = !debug.canvas.visible;
+			debug.draw(world);
+		}
+		debug_update.listen('update');
 		if (Dolly.i != null) Dolly.i.add(debug.canvas);
 		else {
 			root.add(debug.canvas);
