@@ -1,5 +1,6 @@
 package zero.openfl.utilities;
 
+import zero.utilities.Vec2;
 import echo.Body;
 import zero.utilities.IntPoint;
 import openfl.display.Tile;
@@ -129,7 +130,32 @@ class Tilemap extends OpenFLTilemap {
 	}
 
 	public function get_tile(x:Int, y:Int) {
+		if (x < 0 || y < 0 || x >= map[0].length || y >= map.length) return null;
 		return tiles[y][x];
+	}
+
+	public function get_nearest_tile(x:Float, y:Float) {
+		var p1 = Vec2.get(x/options.tileset.frame_width, y/options.tileset.frame_height);
+		var p2 = Vec2.get();
+		var closest:Tile = null;
+		var d:Float = 0;
+		for (j in 0...tiles.length) for (i in 0...tiles[j].length) {
+			if (tiles[j][i] == null) continue;
+			p2.set(i, j);
+			if (closest == null) {
+				closest = tiles[j][i];
+				d = p1.distance(p2);
+				continue;
+			}
+			var d2 = p1.distance(p2);
+			if (d2 < d) {
+				d = d2;
+				closest = tiles[j][i];
+			}
+		}
+		p1.put();
+		p2.put();
+		return closest;
 	}
 
 	function translate_float_to_map(x:Float, y:Float):IntPoint {
