@@ -32,7 +32,6 @@ class Dolly extends Sprite {
 		this.target = target;
 		if (snap) {
 			position.set(-target.x + Game.width / zoom / 2, -target.y + Game.height / zoom / 2);
-			trace('pos', position);
 			x = position.x;
 			y = position.y;
 			apply_bounds();
