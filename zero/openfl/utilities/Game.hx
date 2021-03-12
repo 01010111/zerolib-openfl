@@ -72,7 +72,7 @@ class Game {
 		debug.canvas.visible = false;
 		var debug_update = (?dt) -> {
 			if (Keys.just_pressed(192)) debug.canvas.visible = !debug.canvas.visible;
-			debug.draw(world);
+			if (debug.canvas.visible) debug.draw(world);
 		}
 		debug_update.listen('update');
 		if (Dolly.i != null) Dolly.i.add(debug.canvas);
