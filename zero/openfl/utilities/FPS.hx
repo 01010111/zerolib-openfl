@@ -38,6 +38,9 @@ class FPS extends TextField {
 		if (visible) {
 			text = "FPS: " + times.length + "\nMEM: " + mem + " MB\nMEM peak: " + memPeak + " MB";
 		}
+		#if echo
+		if (Game.i.world != null) text += '\nBODIES: ${Game.i.world.count}';
+		#end
 	}
 
 }
