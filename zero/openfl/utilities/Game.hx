@@ -28,9 +28,10 @@ class Game {
 
 	public var scene(default, null):Scene;
 	public var time_scale:Float = 1;
+	#if debug
+	var fps = new FPS(32, Game.height - 80, 0xFFFFFF);
 	#if echo
 	public var world(default, null):echo.World;
-	#if debug
 	public var debug:echo.util.Debug.OpenFLDebug;
 	#end
 	#end
@@ -81,7 +82,6 @@ class Game {
 			debug.canvas.set_scale(scene.scaleX, scene.scaleY);
 		}
 		#end
-		var fps = new FPS(32, Game.height - 80, 0xFFFFFF);
 		root.add(fps);
 		((?_) -> fps.y = Game.height - 80).listen('resize');
 		#end
