@@ -100,10 +100,11 @@ class TextTools {
 	}
 
 	static function get_format_from_options(options:TextFormatOptions) {
+		var color = options.color == null ? 0x000000 : options.color.to_hex_24();
 		return new TextFormat(
 			options.font,
 			options.size,
-			options.color.to_hex_24(),
+			color,
 			options.bold,
 			options.italic,
 			options.underline,
