@@ -21,7 +21,7 @@ class Game {
 	public static var width(get, never):Float;
 	public static var height(get, never):Float;	
 	public static var root:Sprite;
-	public static var mouse:Vec2 = [0, 0];
+	public static var mouse:Vec2 = Vec2.get();
 
 	static function get_width() return Lib.application.window.width;
 	static function get_height() return Lib.application.window.height;
@@ -33,8 +33,6 @@ class Game {
 	#if echo
 	public var world(default, null):echo.World;
 	public var debug:echo.util.Debug.OpenFLDebug;
-	#end
-	#end
 
 	var last = haxe.Timer.stamp();
 	var focus_lost:Bool = false;
