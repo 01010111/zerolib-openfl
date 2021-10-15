@@ -33,6 +33,8 @@ class Game {
 	#if echo
 	public var world(default, null):echo.World;
 	public var debug:echo.util.Debug.OpenFLDebug;
+	#end
+	#end
 
 	var last = haxe.Timer.stamp();
 	var focus_lost:Bool = false;
