@@ -21,7 +21,7 @@ class TextTools {
 	// Static Extensions
 
 	public static function format(text:TextField, options:TextFormatOptions, cache:String = '') {
-		text.setTextFormat(get_format_from_options(options));
+		text.defaultTextFormat = get_format_from_options(options);
 		if (cache.length > 0) store_format(cache, options);
 		text.autoSize = switch options.align {
 			case null | JUSTIFY | LEFT | START : LEFT;
