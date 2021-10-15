@@ -11,9 +11,9 @@ using zero.utilities.EventBus;
 class Dolly extends Sprite {
 
 	var target:DisplayObject;
-	var position:Vec2 = [0, 0];
-	var offset:Vec2 = [0, 0];
-	var offset_amt:Vec2 = [96, 64];
+	var position:Vec2 = Vec2.get();
+	var offset:Vec2 = Vec2.get();
+	var offset_amt:Vec2 = Vec2.get(96, 64);
 	var bounds:Rect;
 	var zoom(get, never):Float;
 
@@ -38,7 +38,7 @@ class Dolly extends Sprite {
 		}
 	}
 
-	public function update(?dt:Float) {
+	public function update(?dt:Dynamic) {
 		if (target == null) return;
 		get_target_position(position);
 		get_offset();
