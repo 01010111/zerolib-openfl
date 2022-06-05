@@ -3,46 +3,32 @@ package zero.openfl.utilities;
 class Controller {
 	
 	static var key_map:Map<Action, Array<Int>> = [
-	/*	A				=> [90, 67],
+		A				=> [90, 67],
 		B				=> [88],
+		X				=> [90, 67],
+		Y				=> [88],
 		UP				=> [38],
 		DOWN			=> [40],
 		LEFT			=> [37],
 		RIGHT			=> [39],
 		START			=> [13],
 		SELECT			=> [9],
-		LEFT_BUMPER	=> [65],
-		RIGHT_BUMPER	=> [68],*/
-		AIM => [90, 67],
-		INTERACT => [88],
-		UP => [38],
-		DOWN => [40],
-		LEFT => [37],
-		RIGHT => [39],
-		SHELL_MENU => [],
-		YOLK_MENU => [],
-		PAUSE => [13],
+		LEFT_BUMPER		=> [65],
+		RIGHT_BUMPER	=> [68],
 	];
 	static var pad_map:Map<Action, Button> = [
-		/*A				=> A,
+		A				=> A,
 		B				=> B,
+		X				=> X,
+		Y				=> Y,
 		UP				=> UP,
 		DOWN			=> DOWN,
 		LEFT			=> LEFT,
 		RIGHT			=> RIGHT,
 		START			=> START,
 		SELECT			=> SELECT,
-		LEFT_BUMPER	=> LEFT_BUMPER,
-		RIGHT_BUMPER	=> RIGHT_BUMPER,*/
-		UP => UP,
-		DOWN => DOWN,
-		LEFT => LEFT,
-		RIGHT => RIGHT,
-		AIM => RIGHT_TRIGGER,
-		INTERACT => A,
-		SHELL_MENU => LEFT_BUMPER,
-		YOLK_MENU => RIGHT_BUMPER,
-		PAUSE => START,
+		LEFT_BUMPER		=> LEFT_BUMPER,
+		RIGHT_BUMPER	=> RIGHT_BUMPER,
 	];
 
 	public static function set_key(a:Action, k:Int) key_map.set(a, [k]);
@@ -88,17 +74,18 @@ class Controller {
 }
 
 enum Action {
-	// Chicken controls
+	A;
+	B;
+	X;
+	Y;
 	UP;
 	DOWN;
 	LEFT;
 	RIGHT;
-	AIM;
-	INTERACT;
-	SHELL_MENU;
-	YOLK_MENU;
-	// Generic controls
-	PAUSE;
+	START;
+	SELECT;
+	LEFT_BUMPER;
+	RIGHT_BUMPER;
 }
 
 enum abstract Button(Int) {

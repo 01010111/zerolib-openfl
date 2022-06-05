@@ -1,23 +1,23 @@
 package zero.openfl.utilities;
 
+import zero.utilities.Vec2;
+import echo.Body;
 import zero.utilities.IntPoint;
 import openfl.display.Tile;
 import openfl.geom.Rectangle;
-import openfl.display.Tilemap as OTilemap;
-import openfl.display.Tileset as OTileset;
+import openfl.display.Tilemap as OpenFLTilemap;
+import openfl.display.Tileset as OpenFLTileset;
 
 using openfl.Assets;
 using zero.extensions.ArrayExt;
 using Math;
 using Std;
 
-class Tilemap extends OTilemap {
+class Tilemap extends OpenFLTilemap {
 
-	#if echo
-	public var bodies:Array<Body>;
-	#end
 	var map:Array<Array<Int>>;
 	var options:TilemapOptions;
+	var tiles:Array<Array<Tile>>;
 
 	public function new(options:TilemapOptions) {
 		super(
@@ -61,27 +61,45 @@ class Tilemap extends OTilemap {
 		Game.i.world.width = map[0].length * options.tileset.frame_width;
 		Game.i.world.height = map.length * options.tileset.frame_height;
 		#end
-		if (options.solids != null) make_solids(map, options.solids);
-		for (j in 0...map.length) for (i in 0...map[j].length) {
-			addTile(new Tile(map[j][i], i * w, j * h));
+		tiles = [];
+		for (j in 0...map.length) {
+			tiles[j] = [];
+			for (i in 0...map[j].length) {
+				if (map[j][i] < 0) continue;
+				tiles[j][i] = addTile(new Tile(map[j][i], i * w, j * h));
+			}
 		}
 	}
 
-	function make_solids(map:Array<Array<Int>>, solids:Array<Int>) {
-		#if echo
-		bodies = echo.util.TileMap.generate([for (j in 0...map.length) for (i in 0...map[j].length) solids.contains(map[j][i]) ? 1 : -1], 16, 16, map[0].length, map.length);
-		for (body in bodies) {
-			Game.i.world.add(body);
-			PLAYSTATE.physics_objects.push(body);
-			PLAYSTATE.obstructions.push(body);
+	#if echo
+	public function get_bodies(tile_ids:Array<Int>, singles:Bool = false):Array<echo.Body> {
+		if (singles) {
+			var out = [];
+			var query_map = query_array(tile_ids);
+			for (j in 0...query_map.length) for (i in 0...query_map[j].length) {
+				if (query_map[j][i] > 0) {
+					var body = new Body({
+						shape: {
+							type: RECT,
+							width: options.tileset.frame_width,
+							height: options.tileset.frame_height
+						},
+						x: i * options.tileset.frame_width + options.tileset.frame_width/2,
+						y: j * options.tileset.frame_height + options.tileset.frame_height/2,
+						mass: 0,
+					});
+					body.data.tile = get_tile(i, j);
+					out.push(body);
+				}
+			}
+			return out;
 		}
-		#end
+		return echo.util.TileMap.generate(query_array(tile_ids).flatten(), options.tileset.frame_width, options.tileset.frame_height, map[0].length, map.length);
 	}
+	#end
 
-	public function get_solids_array(?solids:Array<Int>):Array<Array<Int>> {
-		if (solids == null && options.solids == null) return [];
-		if (solids == null) solids = options.solids;
-		return [for (j in 0...map.length) [for (i in 0...map[j].length) solids.contains(map[j][i]) ? 1 : 0]];
+	public function query_array(tile_ids:Array<Int>):Array<Array<Int>> {
+		return [for (j in 0...map.length) [for (i in 0...map[j].length) tile_ids.indexOf(map[j][i]) >= 0 ? 1 : 0]];
 	}
 
 	public function get_map(copy:Bool = true):Array<Array<Int>> {
@@ -111,8 +129,33 @@ class Tilemap extends OTilemap {
 		return out;
 	}
 
-	function get_tile(x:Int, y:Int) {
-		return getTileAt(y * map[0].length + x);
+	public function get_tile(x:Int, y:Int) {
+		if (x < 0 || y < 0 || x >= map[0].length || y >= map.length) return null;
+		return tiles[y][x];
+	}
+
+	public function get_nearest_tile(x:Float, y:Float) {
+		var p1 = Vec2.get(x/options.tileset.frame_width, y/options.tileset.frame_height);
+		var p2 = Vec2.get();
+		var closest:Tile = null;
+		var d:Float = 0;
+		for (j in 0...tiles.length) for (i in 0...tiles[j].length) {
+			if (tiles[j][i] == null) continue;
+			p2.set(i, j);
+			if (closest == null) {
+				closest = tiles[j][i];
+				d = p1.distance(p2);
+				continue;
+			}
+			var d2 = p1.distance(p2);
+			if (d2 < d) {
+				d = d2;
+				closest = tiles[j][i];
+			}
+		}
+		p1.put();
+		p2.put();
+		return closest;
 	}
 
 	function translate_float_to_map(x:Float, y:Float):IntPoint {
@@ -121,7 +164,7 @@ class Tilemap extends OTilemap {
 
 }
 
-class Tileset extends OTileset {
+class Tileset extends OpenFLTileset {
 
 	public function new(options:TilesetOptions) {
 		super(options.image.getBitmapData());
@@ -139,7 +182,6 @@ typedef TilemapOptions = {
 	map:Array<Array<Int>>,
 	tileset:TilesetOptions,
 	smoothing:Bool,
-	?solids:Array<Int>,
 	?auto:Bool,
 }
 
