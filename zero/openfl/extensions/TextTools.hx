@@ -75,6 +75,11 @@ class TextTools {
 		return text;
 	}
 
+	public static function on<T>(text:TextField, event:openfl.events.EventType<T>, callback:Dynamic -> TextField -> Void):TextField {
+		text.addEventListener(event, (e) -> callback(e, text));
+		return text;
+	}
+
 	// Util
 
 	public static function wrap_string(string:String, text:TextField, width:Float):String {
