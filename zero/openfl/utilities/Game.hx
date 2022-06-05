@@ -1,5 +1,6 @@
 package zero.openfl.utilities;
 
+import openfl.events.MouseEvent;
 import openfl.events.FocusEvent;
 import zero.utilities.Tween;
 import zero.utilities.Tween.TweenProperty;
@@ -28,12 +29,14 @@ class Game {
 
 	public var scene(default, null):Scene;
 	public var time_scale:Float = 1;
-	#if debug
-	var fps = new FPS(32, Game.height - 80, 0xFFFFFF);
 	#if echo
 	public var world(default, null):echo.World;
-	public var debug:echo.util.Debug.OpenFLDebug;
 	#end
+	#if debug
+	var fps = new FPS(32, Game.height - 80, 0xFFFFFF);
+	#end
+	#if (echo && debug)
+	public var debug:echo.util.Debug.OpenFLDebug;
 	#end
 
 	var last = haxe.Timer.stamp();
@@ -98,7 +101,9 @@ class Game {
 		dt = dt.min(0.1);
 		if (dt > 1) trace(dt);
 		last = time;
-		#if echo if (world != null) world.step(dt); #end
+		#if echo
+		if (world != null) world.step(dt);
+		#end
 		'update'.dispatch(dt);
 		Tween.update(dt);
 		Timer.update(dt);
