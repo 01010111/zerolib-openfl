@@ -36,7 +36,7 @@ class Controller {
 	public static function pressed(action:Action) {
 		// Keyboard
 		var keys = false;
-		for (key in key_map[action]) if (Keys.pressed(key)) keys = true;
+		for (key in key_map[action]) if (Keys.pressed(cast key)) keys = true;
 		// Gamepad
 		var gamepad = false;
 		if ((cast pad_map[action]) < 0 && Gamepad.axis_pressed((cast pad_map[action]) * -1)) gamepad = true;
@@ -47,7 +47,7 @@ class Controller {
 	public static function just_pressed(action:Action) {
 		// Keyboard
 		var keys = false;
-		for (key in key_map[action]) if (Keys.just_pressed(key)) keys = true;
+		for (key in key_map[action]) if (Keys.just_pressed(cast key)) keys = true;
 		// Gamepad
 		var gamepad = false;
 		if ((cast pad_map[action]) < 0 && Gamepad.axis_pressed((cast pad_map[action]) * -1)) gamepad = true;
@@ -58,7 +58,7 @@ class Controller {
 	public static function just_released(action:Action) {
 		// Keyboard
 		var keys = false;
-		for (key in key_map[action]) if (Keys.just_released(key)) keys = true;
+		for (key in key_map[action]) if (Keys.just_released(cast key)) keys = true;
 		// Gamepad
 		var gamepad = false;
 		if ((cast pad_map[action]) < 0 && Gamepad.axis_pressed((cast pad_map[action]) * -1)) gamepad = true;

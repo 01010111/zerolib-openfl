@@ -75,7 +75,7 @@ class Game {
 		debug = new echo.util.Debug.OpenFLDebug();
 		debug.canvas.visible = false;
 		var debug_update = (?dt) -> {
-			if (Keys.just_pressed(192)) debug.canvas.visible = !debug.canvas.visible;
+			if (Keys.just_pressed(cast 192)) debug.canvas.visible = !debug.canvas.visible;
 			if (debug.canvas.visible) debug.draw(world);
 		}
 		debug_update.listen('update');
